@@ -10,6 +10,12 @@ df = pd.read_csv(
     "data/WA_Fn-UseC_-Telco-Customer-Churn.csv"
 )
 
+df.drop(
+    "customerID",
+    axis=1,
+    inplace=True
+)
+
 print(df.head())
 
 
@@ -73,18 +79,25 @@ plt.close()
 
 print("Starting Heatmap...")
 
-df_heat = pd.get_dummies(df, drop_first=True)
+# Convert TotalCharges to numeric
+df["TotalCharges"] = pd.to_numeric(
+    df["TotalCharges"],
+    errors="coerce"
+)
 
-numeric_cols = df_heat.select_dtypes(include=np.number)
+# Keep only numeric columns
+numeric_df = df.select_dtypes(include=np.number)
 
-corr = numeric_cols.corr()
+print(numeric_df.columns)
 
-plt.figure(figsize=(10,6))
+corr = numeric_df.corr()
+
+plt.figure(figsize=(8,6))
 
 sns.heatmap(
     corr,
-    cmap="coolwarm",
-    cbar=False
+    annot=True,
+    cmap="coolwarm"
 )
 
 plt.title("Correlation Heatmap")
@@ -99,18 +112,37 @@ plt.close()
 
 print("Heatmap Done")
 
+print("Creating Churn Correlation Plot...")
+
+df_heat = pd.get_dummies(
+    df,
+    drop_first=True
+)
+
+corr = df_heat.corr()
+
+churn_corr = corr["Churn_Yes"].sort_values()
+
+plt.figure(figsize=(8,8))
+
+churn_corr.plot(
+    kind="barh"
+)
+
 plt.title(
-    "Correlation Heatmap"
+    "Features Correlated with Churn"
 )
 
 plt.tight_layout()
 
 plt.savefig(
-    "outputs/figures/correlation_heatmap.png"
+    "outputs/figures/churn_correlation.png",
+    dpi=300
 )
 
 plt.close()
 
+print("Churn Correlation Plot Saved")
 
 
 fig, axes = plt.subplots(

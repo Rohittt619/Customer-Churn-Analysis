@@ -122,3 +122,78 @@ plt.gca().invert_yaxis()
 plt.tight_layout()
 plt.savefig('outputs/figures/feature_importance.png', dpi=150)
 plt.show()
+
+
+
+
+
+#
+results = []
+
+for name, model in models.items():
+
+    print(f"\nRunning {name}...")
+
+    model.fit(X_train_scaled, y_train)
+
+    y_pred = model.predict(X_test_scaled)
+
+    report = classification_report(
+        y_test,
+        y_pred,
+        output_dict=True
+    )
+
+    roc = roc_auc_score(
+        y_test,
+        model.predict_proba(X_test_scaled)[:, 1]
+    )
+
+    # Find the positive class automatically
+    class_keys = [
+        k for k in report.keys()
+        if k not in ["accuracy", "macro avg", "weighted avg"]
+    ]
+
+    positive_class = class_keys[-1]
+
+    results.append({
+        "Model": name,
+        "Accuracy": report["accuracy"],
+        "Precision": report[positive_class]["precision"],
+        "Recall": report[positive_class]["recall"],
+        "F1_Score": report[positive_class]["f1-score"],
+        "ROC_AUC": roc
+    })
+
+results_df = pd.DataFrame(results)
+
+print("\nModel Comparison:")
+print(results_df)
+
+results_df.to_csv(
+    "outputs/model_results.csv",
+    index=False
+)
+
+results_df = pd.DataFrame(results)
+
+results_df.to_csv(
+    "outputs/model_results.csv",
+    index=False
+)
+
+# Sort models by ROC-AUC
+results_df = results_df.sort_values(
+    by="ROC_AUC",
+    ascending=False
+)
+
+print("\nModel Comparison:")
+print(results_df)
+
+print("\nBest Model:")
+print(results_df.iloc[0])
+
+print("Model Results Saved")
+

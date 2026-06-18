@@ -31,11 +31,6 @@ customer-churn-analysis/
 │   ├── WA_Fn-UseC_-Telco-Customer-Churn.csv   # raw dataset
 │   └── cleaned_churn.csv                        # after preprocessing
 │
-├── notebooks/
-│   ├── 01_EDA.ipynb                             # exploratory data analysis
-│   ├── 02_Visualizations.ipynb                  # all charts and plots
-│   └── 03_ML_Models.ipynb                       # model training & evaluation
-│
 ├── src/
 │   ├── preprocess.py                            # data cleaning functions
 │   ├── eda.py                                   # EDA helper functions
